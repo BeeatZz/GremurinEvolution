@@ -147,3 +147,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea2f7506feacd664582e6716fc914641, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fallSpeed: 5
+  bounceHeight: 0.7
+  bounceSpeed: 7
+  squashFactor: 0.7
+  stretchFactor: 1
+  squashDuration: 0.1
+  minRattleDelay: 1
+  maxRattleDelay: 3
+  rattleAmount: 0.07
+  rattleDuration: 0.2

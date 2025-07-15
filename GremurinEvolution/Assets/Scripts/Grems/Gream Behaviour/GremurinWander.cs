@@ -18,7 +18,6 @@ public class GremurinWander : MonoBehaviour
     [Header("Screen Padding")]
     public float padding = 0.3f;
 
-    // No longer directly setting sprite if Animator handles all states
     // public Sprite defaultIdleSprite; 
 
     private Vector3 targetPosition;
@@ -29,8 +28,7 @@ public class GremurinWander : MonoBehaviour
     private float pauseTimer = 0f;
     private float currentPauseDuration = 1.5f;
 
-    private float moveTimer = 0f; // Tracks time spent in current movement phase
-    // currentMoveDuration is now implicitly set by minMoveTime when picking a new target
+    private float moveTimer = 0f; 
 
     private bool isPaused = false;
     private bool isBeingDragged = false;
@@ -59,9 +57,7 @@ public class GremurinWander : MonoBehaviour
         currentScale = baseScale;
         targetScale = baseScale;
 
-        // Calculate screen bounds with padding
         Camera cam = Camera.main;
-        // Ensure the camera exists and is active, otherwise this will fail
         if (cam == null)
         {
             Debug.LogError("Main Camera not found! Please tag your main camera as 'MainCamera'.");
@@ -74,86 +70,79 @@ public class GremurinWander : MonoBehaviour
         minBounds = new Vector2(bottomLeft.x + padding, bottomLeft.y + padding);
         maxBounds = new Vector2(topRight.x - padding, topRight.y - padding);
 
-        StartPaused(); // Ensure the Gremurin starts in a paused (idle) state
+        StartPaused(); 
     }
 
     void Update()
     {
-        // 1. Handle Dragging State (Highest Priority)
         if (isBeingDragged)
         {
-            SetAnimationToIdle(); // Ensure idle animation when dragged
+            SetAnimationToIdle(); 
             targetScale = baseScale * dragScaleMultiplier;
             currentScale = Vector3.Lerp(currentScale, targetScale, Time.deltaTime * dragScaleSpeed);
             transform.localScale = currentScale;
-            return; // Exit Update early, no other logic runs
+            return; 
         }
 
-        // 2. Handle Paused State
+        
         if (isPaused)
         {
             pauseTimer += Time.deltaTime;
             if (pauseTimer >= currentPauseDuration)
             {
-                isPaused = false; // End pause
-                PickNewTarget();  // Start a new movement phase
+                isPaused = false; 
+                PickNewTarget();  
             }
 
-            SetAnimationToIdle(); // Keep idle animation when paused
-            targetScale = baseScale; // Ensure scale is base when not dragged
+            SetAnimationToIdle(); 
+            targetScale = baseScale; 
             currentScale = Vector3.Lerp(currentScale, targetScale, Time.deltaTime * dragScaleSpeed);
             transform.localScale = currentScale;
-            return; // Exit Update early, no other logic runs
+            return; 
         }
 
-        // 3. Handle Movement State (when not dragged or paused)
+        
         Vector3 dir = (targetPosition - transform.position);
         float distanceToTarget = dir.magnitude;
 
-        // Check if Gremurin has reached its current target
-        if (distanceToTarget <= 0.05f) // Threshold to consider "at target"
+        
+        if (distanceToTarget <= 0.05f)
         {
-            // If at target, transition to a paused (idle) state
             isPaused = true;
-            pauseTimer = 0f; // Reset pause timer
-            currentPauseDuration = Random.Range(minPauseTime, maxPauseTime); // Randomize next pause duration
-            moveTimer = 0f; // Reset move timer for the next movement cycle
+            pauseTimer = 0f; 
+            currentPauseDuration = Random.Range(minPauseTime, maxPauseTime); 
+            moveTimer = 0f; 
 
-            ResetToIdle(); // Resets rotation (if any)
-            SetAnimationToIdle(); // Tell Animator to transition to Idle state
+            ResetToIdle(); 
+            SetAnimationToIdle(); 
 
-            targetScale = baseScale; // Ensure scale is base when idle
+            targetScale = baseScale; 
         }
-        else // Gremurin is still actively moving towards the target
+        else 
         {
-            // Ensure animator is playing the walking animation
+            
             if (animator != null && !animator.GetBool("IsWalking"))
             {
                 animator.SetBool("IsWalking", true);
             }
 
-            // Handle actual position movement
+         
             Vector3 move = dir.normalized * moveSpeed * Time.deltaTime;
             transform.position += move;
 
-            // Flip sprite based on direction
             if (dir.x > 0.01f)
                 spriteRenderer.flipX = true;
             else if (dir.x < -0.01f)
                 spriteRenderer.flipX = false;
 
-            targetScale = baseScale; // Maintain base scale when walking
+            targetScale = baseScale; 
         }
 
-        // Apply scale changes (always happens, ensures smooth scale transitions)
         currentScale = Vector3.Lerp(currentScale, targetScale, Time.deltaTime * dragScaleSpeed);
         transform.localScale = currentScale;
     }
 
-    /// <summary>
-    /// Sets the Animator's "IsWalking" parameter to false, prompting a transition to the idle state.
-    /// Does not manually disable the Animator or set the sprite.
-    /// </summary>
+  
     private void SetAnimationToIdle()
     {
         if (animator != null && animator.GetBool("IsWalking"))
@@ -162,47 +151,36 @@ public class GremurinWander : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Picks a new random target position within the wander radius and screen bounds.
-    /// </summary>
+
     void PickNewTarget()
     {
         Vector2 randomOffset = Random.insideUnitCircle * wanderRadius;
         Vector3 potentialTarget = transform.position + (Vector3)randomOffset;
 
-        // Clamp the potential target to stay within screen bounds
         potentialTarget.x = Mathf.Clamp(potentialTarget.x, minBounds.x, maxBounds.x);
         potentialTarget.y = Mathf.Clamp(potentialTarget.y, minBounds.y, maxBounds.y);
 
         targetPosition = potentialTarget;
-        moveTimer = 0f; // Reset move timer for the start of this new movement phase
-        // The actual duration for which it will move is dictated by moveSpeed and distance to target
-        // until it reaches the target or hits the minMoveTime for the *next* decision, if you re-implement that.
+        moveTimer = 0f;
+     
     }
 
-    /// <summary>
-    /// Resets the Gremurin's rotation to identity (no rotation).
-    /// </summary>
+    
     void ResetToIdle()
     {
         transform.rotation = Quaternion.identity;
     }
 
-    /// <summary>
-    /// Puts the Gremurin into a paused state, immediately setting its animation to idle.
-    /// </summary>
+    
     public void StartPaused()
     {
         isPaused = true;
         pauseTimer = 0f;
         currentPauseDuration = Random.Range(minPauseTime, maxPauseTime);
-        SetAnimationToIdle(); // Ensure it starts in an idle animation state
+        SetAnimationToIdle(); 
     }
 
-    /// <summary>
-    /// Sets the dragging state of the Gremurin. Adjusts sorting order and transitions to idle when dropped.
-    /// </summary>
-    /// <param name="dragging">True if the Gremurin is currently being dragged, false otherwise.</param>
+
     public void SetDragging(bool dragging)
     {
         isBeingDragged = dragging;
@@ -212,7 +190,7 @@ public class GremurinWander : MonoBehaviour
 
         if (!dragging)
         {
-            StartPaused(); // When dropped, immediately go to a paused (idle) state
+            StartPaused(); 
         }
     }
 }
