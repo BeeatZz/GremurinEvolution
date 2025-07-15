@@ -46,6 +46,7 @@ public class GremPool : MonoBehaviour
 
         if (pools[level].Count == 0)
         {
+            Debug.LogWarning($"Llegaste al limite de grems. Creando otro igualmente. xd");
             GameObject obj = Instantiate(prefabLookup[level]);
             return obj;
         }
