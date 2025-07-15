@@ -1,0 +1,8 @@
+*.vsconfig
+*.csproj
+*.sln
+GremurinEvolution/.vs/
+GremurinEvolution/Library/
+GremurinEvolution/Temp/
+GremurinEvolution/UserSettings/
+GremurinEvolution/Logs/
