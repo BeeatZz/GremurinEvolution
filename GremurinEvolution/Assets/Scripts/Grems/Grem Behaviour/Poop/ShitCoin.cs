@@ -1,26 +1,25 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class ShitCoin : MonoBehaviour
 {
-    
     [Header("Poop Data & Motion")]
-    public ListaDeCacas poopData;
-    public Transform poopSpawnPoint;
-    public Transform poopSpawnPointFlipped;
-    public float arcHeight = 2f;
-    public float duration = 1f;
-    public float launchDistance = 2f;
-    public int poopCounter = 0;
-    public int specialPoopRequirement;
+    [SerializeField] private ListaDeCacas poopData;
+    [SerializeField] private GameObject poopPrefab;
+    [SerializeField] private Transform poopSpawnPoint;
+    [SerializeField] private Transform poopSpawnPointFlipped;
+    [SerializeField] private float arcHeight = 2f;
+    [SerializeField] private float duration = 1f;
+    [SerializeField] private float launchDistance = 2f;
+    [SerializeField] private int specialPoopRequirement;
+    [SerializeField] private int poopLevel;
+    [SerializeField] private int specialPoopLevel;
+    [SerializeField] private int poopCounter = 0;
+
     private float poopTimer = 0f;
     private float elapsedTime = 0f;
 
-    public int poopLevel;
-    public int specialPoopLevel;
-
-
-
-    void Update()
+    private void Update()
     {
         if (poopData == null)
         {
@@ -34,7 +33,7 @@ public class ShitCoin : MonoBehaviour
 
         if (poopTimer >= interval)
         {
-            if(poopCounter < specialPoopRequirement)
+            if (poopCounter < specialPoopRequirement)
             {
                 LaunchPoop(poopLevel);
             }
@@ -50,9 +49,6 @@ public class ShitCoin : MonoBehaviour
     {
         if (poopData == null) return;
 
-        GameObject poop = CacaPool.Instance.GetFromPool(poopData.poopLevel);
-        if (poop == null) return;
-
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
 
         Transform spawnPointToUse = poopSpawnPoint;
@@ -62,11 +58,15 @@ public class ShitCoin : MonoBehaviour
             spawnPointToUse = poopSpawnPointFlipped;
         }
 
-        poop.transform.position = spawnPointToUse.position;
-        poop.transform.rotation = Quaternion.identity;
+        GameObject poop = ObjectPoolManager.SpawnObject(poopPrefab, spawnPointToUse.position, Quaternion.identity);
 
-        CacaVoladora mover = poop.GetComponent<CacaVoladora>();
-        if (mover == null) mover = poop.AddComponent<CacaVoladora>();
+        CacaVoladora cacaEnMov = poop.GetComponent<CacaVoladora>();
+
+        if (!cacaEnMov)
+        {
+            Debug.LogError("Prefab no contiene CacaVoladora");
+            return;
+        }
 
         Vector3 direction = spawnPointToUse.right;
 
@@ -75,14 +75,14 @@ public class ShitCoin : MonoBehaviour
             direction = -direction;
         }
 
+        cacaEnMov.start = spawnPointToUse.position;
+        cacaEnMov.end = spawnPointToUse.position + direction * launchDistance;
+        cacaEnMov.arcHeight = arcHeight;
+        cacaEnMov.duration = duration;
+        cacaEnMov.level = level;
+        cacaEnMov.poopValue = poopData.listaDeCacas[level -1].poopValue;
 
-        mover.start = spawnPointToUse.position;
-        mover.end = spawnPointToUse.position + direction * launchDistance;
-        mover.arcHeight = arcHeight;
-        mover.duration = duration;
-        mover.level = poopData.poopLevel;
-        mover.poopValue = poopData.poopValue;
-        if(poopCounter < specialPoopRequirement)
+        if (poopCounter < specialPoopRequirement)
         {
             poopCounter++;
         }
@@ -91,6 +91,4 @@ public class ShitCoin : MonoBehaviour
             poopCounter = 0;
         }
     }
-    
-
 }

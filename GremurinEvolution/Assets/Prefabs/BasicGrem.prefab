@@ -211,12 +211,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7d5408e6731f6a48bcff70f3ac80030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poopData: {fileID: 11400000, guid: d5cd133415510954592b03d9304192fa, type: 2}
+  poopData: {fileID: 11400000, guid: 7eca7ff44dc80684cb75281ab5127add, type: 2}
+  poopPrefab: {fileID: 2483140147408246152, guid: d275a08e540f760459626e66a237b687, type: 3}
   poopSpawnPoint: {fileID: 3183249872531352297}
   poopSpawnPointFlipped: {fileID: 1480379401021304536}
   arcHeight: 0.2
   duration: 0.2
   launchDistance: 1
+  specialPoopRequirement: 5
+  poopLevel: 1
+  specialPoopLevel: 2
+  poopCounter: 0
 --- !u!1 &7993748092805045526
 GameObject:
   m_ObjectHideFlags: 0
