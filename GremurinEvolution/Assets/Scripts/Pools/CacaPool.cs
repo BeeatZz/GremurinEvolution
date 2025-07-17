@@ -4,6 +4,7 @@ using UnityEngine;
 public class CacaPool : MonoBehaviour
 {
     public static CacaPool Instance;
+    public ListaDeCacas poopData;
 
     [System.Serializable]
     public class PooledCaca

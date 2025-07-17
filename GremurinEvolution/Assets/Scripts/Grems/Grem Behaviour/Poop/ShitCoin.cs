@@ -2,16 +2,23 @@ using UnityEngine;
 
 public class ShitCoin : MonoBehaviour
 {
+    
     [Header("Poop Data & Motion")]
-    public CacaData poopData;
+    public ListaDeCacas poopData;
     public Transform poopSpawnPoint;
     public Transform poopSpawnPointFlipped;
     public float arcHeight = 2f;
     public float duration = 1f;
-    public float launchDistance = 2f;  
-
+    public float launchDistance = 2f;
+    public int poopCounter = 0;
+    public int specialPoopRequirement;
     private float poopTimer = 0f;
     private float elapsedTime = 0f;
+
+    public int poopLevel;
+    public int specialPoopLevel;
+
+
 
     void Update()
     {
@@ -23,16 +30,23 @@ public class ShitCoin : MonoBehaviour
         elapsedTime += Time.deltaTime;
         poopTimer += Time.deltaTime;
 
-        float interval = poopData.poopRateCurve.Evaluate(elapsedTime);
+        float interval = poopData.listaDeCacas[poopLevel].poopRateCurve.Evaluate(elapsedTime);
 
         if (poopTimer >= interval)
         {
+            if(poopCounter < specialPoopRequirement)
+            {
+                LaunchPoop(poopLevel);
+            }
+            else
+            {
+                LaunchPoop(specialPoopLevel);
+            }
             poopTimer = 0f;
-            LaunchPoop();
         }
     }
 
-    public void LaunchPoop()
+    public void LaunchPoop(int level)
     {
         if (poopData == null) return;
 
@@ -68,5 +82,15 @@ public class ShitCoin : MonoBehaviour
         mover.duration = duration;
         mover.level = poopData.poopLevel;
         mover.poopValue = poopData.poopValue;
+        if(poopCounter < specialPoopRequirement)
+        {
+            poopCounter++;
+        }
+        else
+        {
+            poopCounter = 0;
+        }
     }
+    
+
 }
