@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ElementsEnum;
 
 public class GremurinWander : MonoBehaviour
 {
@@ -44,7 +45,7 @@ public class GremurinWander : MonoBehaviour
 
     public int level = 1;
     public bool IsBeingDragged => isBeingDragged;
-
+    public ElementType ElementType;
     void Start()
     {
         animator = GetComponent<Animator>();

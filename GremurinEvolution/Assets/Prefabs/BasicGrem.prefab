@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 1385710095671416911}
   - component: {fileID: 3555705037431849070}
   - component: {fileID: 5295876073404164858}
-  - component: {fileID: 8215576072405587749}
   m_Layer: 0
   m_Name: BasicGrem
   m_TagString: Untagged
@@ -199,29 +198,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8215576072405587749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3397457782794937955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7d5408e6731f6a48bcff70f3ac80030, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  poopData: {fileID: 11400000, guid: 7eca7ff44dc80684cb75281ab5127add, type: 2}
-  poopPrefab: {fileID: 2483140147408246152, guid: d275a08e540f760459626e66a237b687, type: 3}
-  poopSpawnPoint: {fileID: 3183249872531352297}
-  poopSpawnPointFlipped: {fileID: 1480379401021304536}
-  arcHeight: 0.2
-  duration: 0.2
-  launchDistance: 1
-  specialPoopRequirement: 5
-  poopLevel: 1
-  specialPoopLevel: 2
-  poopCounter: 0
 --- !u!1 &7993748092805045526
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,6 +6,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ListaDeCacas")]
 public class ListaDeCacas : ScriptableObject
 {
+
+    
+
     [System.Serializable]
     public class CacaData 
     {

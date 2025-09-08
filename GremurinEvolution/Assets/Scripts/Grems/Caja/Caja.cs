@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using static ElementsEnum;
 
 public class Caja : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class Caja : MonoBehaviour
     [SerializeField] private float rattleAmount = 0.05f;
     [SerializeField] private float rattleDuration = 0.2f;
 
+    [Header("Pool References")]
+    [SerializeField] private GameObject gremPrefab; 
+    [SerializeField] private GameObject cajaPrefab; 
+
     private bool isFalling = false;
     private bool isRattling = false;
     private Vector3 targetPosition;
@@ -24,6 +29,9 @@ public class Caja : MonoBehaviour
     private Vector3 originalScale;
     private Vector3 originalPosition;
     private Coroutine rattleCoroutine;
+
+    private ElementType gremType;
+    [SerializeField] private GremBook gremRegistry;
 
     void Awake()
     {
@@ -114,7 +122,10 @@ public class Caja : MonoBehaviour
             transform.position = originalPosition;
         }
     }
-
+    public void SetDelivery(ElementType type)
+    {
+        gremType = type;
+    }
     public void Drop(Vector3 targetPos)
     {
         transform.position = new Vector3(targetPos.x, 10.0f, targetPos.z);
@@ -129,18 +140,19 @@ public class Caja : MonoBehaviour
 
     public void OpenCaja()
     {
-        if (rattleCoroutine != null)
-            StopCoroutine(rattleCoroutine);
-        isRattling = false;
-
-        GameObject grem = GremPool.Instance.GetFromPool(level);
-        if (grem != null)
+        GameObject gremPrefab = gremRegistry.GetPrefab(gremType);
+        if (gremPrefab != null)
         {
-            grem.transform.position = transform.position;
-            grem.SetActive(true);
+            ObjectPoolManager.SpawnObject(
+                gremPrefab,
+                transform.position,
+                Quaternion.identity,
+                ObjectPoolManager.PoolType.GameObject
+            );
         }
-    }
 
+        ObjectPoolManager.ReturnObjectToPool(gameObject);
+    }
     public void ResetCaja()
     {
         isFalling = false;
@@ -158,13 +170,7 @@ public class Caja : MonoBehaviour
     void OnMouseDown()
     {
         OpenCaja();
-        CajaPool.Instance.ReturnToPool(gameObject, level);
-    }
 
-    private Vector3 GetMouseWorldPos()
-    {
-        Vector3 mousePoint = Input.mousePosition;
-        mousePoint.z = 10f;
-        return Camera.main.ScreenToWorldPoint(mousePoint);
+        ObjectPoolManager.ReturnObjectToPool(gameObject);
     }
 }

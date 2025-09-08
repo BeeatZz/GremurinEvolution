@@ -1,16 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static Combinations;
+using static ElementsEnum;
 
 public class GremMergeManager : MonoBehaviour
 {
     public static GremMergeManager Instance;
 
+    [Header("Merge Settings")]
+    [SerializeField] private float mergeRadius = 0.4f;
+    [SerializeField] private ElementCombinationDatabase combinationDB;
+    [SerializeField] private GremBook gremRegistry;
+
     void Awake() => Instance = this;
 
     public void CheckForMergeAtPosition(Vector3 position)
     {
-        float radius = 0.4f;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(position, radius);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(position, mergeRadius);
 
         List<GremurinWander> grems = new();
         foreach (var hit in hits)
@@ -28,23 +34,41 @@ public class GremMergeManager : MonoBehaviour
         }
     }
 
-    void TryMerge(GremurinWander a, GremurinWander b)
+    private void TryMerge(GremurinWander a, GremurinWander b)
     {
-        if (a.level != b.level) return; // Only merge same level
+        ElementType resultType = FindCombinationResult(a.ElementType, b.ElementType);
+        if (resultType == default) return; 
 
-        int nextLevel = a.level + 1;
         Vector3 mergePosition = (a.transform.position + b.transform.position) / 2;
 
-        GremPool.Instance.ReturnToPool(a.gameObject, a.level);
-        GremPool.Instance.ReturnToPool(b.gameObject, b.level);
+        
+        ObjectPoolManager.ReturnObjectToPool(a.gameObject);
+        ObjectPoolManager.ReturnObjectToPool(b.gameObject);
 
-        GameObject merged = GremPool.Instance.GetFromPool(nextLevel);
-        merged.transform.position = mergePosition;
+        GameObject resultPrefab = gremRegistry.GetPrefab(resultType);
+        if (resultPrefab != null)
+        {
+            ObjectPoolManager.SpawnObject(
+                resultPrefab,
+                mergePosition,
+                Quaternion.identity,
+                ObjectPoolManager.PoolType.GameObject
+            );
+        }
+    }
 
-        // Set the level on the new instance
-        GremurinWander mergedWander = merged.GetComponent<GremurinWander>();
-        mergedWander.level = nextLevel;
+    private ElementType FindCombinationResult(ElementType a, ElementType b)
+    {
+        foreach (var combo in combinationDB.combos)
+        {
+            
+            bool matchDirect = (combo.elementoA == a && combo.elementoB == b);
+            bool matchReverse = (combo.elementoA == b && combo.elementoB == a);
 
-        // Optional: VFX, sound, etc.
+            if (matchDirect || matchReverse)
+                return combo.resultado;
+        }
+
+        return default; 
     }
 }
